@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RepositoryPatternDemo.Entities;
+using RepositoryPatternDemo.Interfaces;
 using RepositoryPatternDemo.Persistence;
 using System;
 using System.Collections.Generic;
@@ -14,16 +15,24 @@ namespace RepositoryPatternDemo.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        public ProductsController(ApplicationDbContext context)
+        private readonly IProductRepository _productRepository;
+        public ProductsController(IProductRepository productRepository)
         {
-            _context = context;
+            _productRepository = productRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
-            var products = await _context.Products.Where(x => x.Rating == 5).Take(1).ToListAsync();
+            var products = await _productRepository.GetAllAsync();
+
+            return Ok(products);
+        }
+
+        [HttpGet("ProductsByCategory")]
+        public async Task<IActionResult> GetProductsByCategory(string category)
+        {
+            var products = await _productRepository.GetByConditionAsync(x => x.Category.Equals(category));
 
             return Ok(products);
         }
@@ -31,7 +40,7 @@ namespace RepositoryPatternDemo.Controllers
         [HttpGet("{id}", Name = "ProductById")]
         public async Task<IActionResult> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _productRepository.GetAsync(id);
 
             if (product == null)
             {
@@ -44,9 +53,9 @@ namespace RepositoryPatternDemo.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct(Product product)
         {
-            _context.Products.Add(product);
+            _productRepository.Add(product);
 
-            await _context.SaveChangesAsync();
+            await _productRepository.SaveAsync();
 
             return CreatedAtRoute("ProductById", new { id = product.Id },
                 product);
@@ -55,11 +64,11 @@ namespace RepositoryPatternDemo.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _productRepository.GetAsync(id);
 
-            _context.Products.Remove(product);
+            _productRepository.Delete(product);
 
-            await _context.SaveChangesAsync();
+            await _productRepository.SaveAsync();
             return NoContent();
         }
 
@@ -67,9 +76,9 @@ namespace RepositoryPatternDemo.Controllers
         public async Task<IActionResult> UpdateProduct(Product
             product)
         {
-            _context.Products.Update(product);
+            _productRepository.Update(product);
 
-            await _context.SaveChangesAsync();
+            await _productRepository.SaveAsync();
 
             return NoContent();
         }
