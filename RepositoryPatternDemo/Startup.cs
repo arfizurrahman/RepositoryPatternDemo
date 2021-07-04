@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using RepositoryPatternDemo.Interfaces;
+using RepositoryPatternDemo.Interfaces.Repositories;
 using RepositoryPatternDemo.Persistence;
 using RepositoryPatternDemo.Persistence.Repositories;
 using System;
@@ -38,7 +38,7 @@ namespace RepositoryPatternDemo
 
             services.AddControllers();
 
-            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddSwaggerGen(c =>
             {

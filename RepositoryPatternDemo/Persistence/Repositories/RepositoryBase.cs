@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RepositoryPatternDemo.Interfaces;
+using RepositoryPatternDemo.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,12 +37,7 @@ namespace RepositoryPatternDemo.Persistence.Repositories
         {
             return await _context.Set<T>().Where(expression).ToListAsync();
         }
-
-        public async Task<bool> SaveAsync()
-        {
-           return await _context.SaveChangesAsync() > 0;
-        }
-
+        
         public void Update(T entity)
         {
             _context.Entry(entity).State = EntityState.Modified;

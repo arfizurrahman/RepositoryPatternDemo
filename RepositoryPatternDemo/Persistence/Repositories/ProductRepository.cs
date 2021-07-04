@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RepositoryPatternDemo.Entities;
 using RepositoryPatternDemo.Interfaces;
+using RepositoryPatternDemo.Interfaces.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;

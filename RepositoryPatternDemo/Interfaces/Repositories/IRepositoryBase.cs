@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace RepositoryPatternDemo.Interfaces
+namespace RepositoryPatternDemo.Interfaces.Repositories
 {
     public interface IRepositoryBase<T> where T : class
     {
@@ -14,6 +14,5 @@ namespace RepositoryPatternDemo.Interfaces
         void Add(T entity);
         void Update(T entity);
         void Delete(T entity);
-        Task<bool> SaveAsync();
     }
 }

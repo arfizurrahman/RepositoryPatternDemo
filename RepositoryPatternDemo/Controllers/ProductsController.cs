@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RepositoryPatternDemo.Entities;
-using RepositoryPatternDemo.Interfaces;
+using RepositoryPatternDemo.Interfaces.Repositories;
 using RepositoryPatternDemo.Persistence;
 using System;
 using System.Collections.Generic;
@@ -15,16 +15,16 @@ namespace RepositoryPatternDemo.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository _productRepository;
-        public ProductsController(IProductRepository productRepository)
+        private readonly IUnitOfWork _unitOfWork;
+        public ProductsController(IUnitOfWork unitOfWork)
         {
-            _productRepository = productRepository;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
-            var products = await _productRepository.GetAllAsync();
+            var products = await _unitOfWork.Products.GetAllAsync();
 
             return Ok(products);
         }
@@ -32,7 +32,7 @@ namespace RepositoryPatternDemo.Controllers
         [HttpGet("ProductsByCategory")]
         public async Task<IActionResult> GetProductsByCategory(string category)
         {
-            var products = await _productRepository.GetByConditionAsync(x => x.Category.Equals(category));
+            var products = await _unitOfWork.Products.GetByConditionAsync(x => x.Category.Equals(category));
 
             return Ok(products);
         }
@@ -40,7 +40,7 @@ namespace RepositoryPatternDemo.Controllers
         [HttpGet("{id}", Name = "ProductById")]
         public async Task<IActionResult> GetProduct(int id)
         {
-            var product = await _productRepository.GetAsync(id);
+            var product = await _unitOfWork.Products.GetAsync(id);
 
             if (product == null)
             {
@@ -53,9 +53,9 @@ namespace RepositoryPatternDemo.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateProduct(Product product)
         {
-            _productRepository.Add(product);
+            _unitOfWork.Products.Add(product);
 
-            await _productRepository.SaveAsync();
+            await _unitOfWork.SaveAsync();
 
             return CreatedAtRoute("ProductById", new { id = product.Id },
                 product);
@@ -64,11 +64,11 @@ namespace RepositoryPatternDemo.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _productRepository.GetAsync(id);
+            var product = await _unitOfWork.Products.GetAsync(id);
 
-            _productRepository.Delete(product);
+            _unitOfWork.Products.Delete(product);
 
-            await _productRepository.SaveAsync();
+            await _unitOfWork.SaveAsync();
             return NoContent();
         }
 
@@ -76,9 +76,9 @@ namespace RepositoryPatternDemo.Controllers
         public async Task<IActionResult> UpdateProduct(Product
             product)
         {
-            _productRepository.Update(product);
+            _unitOfWork.Products.Update(product);
 
-            await _productRepository.SaveAsync();
+            await _unitOfWork.SaveAsync();
 
             return NoContent();
         }
